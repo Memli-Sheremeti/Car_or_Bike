@@ -6,7 +6,7 @@
 #    By: mshereme <mshereme@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/09/08 13:20:26 by mshereme          #+#    #+#              #
-#    Updated: 2025/09/08 14:59:01 by mshereme         ###   ########.fr        #
+#    Updated: 2025/09/08 15:06:36 by mshereme         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,11 +40,11 @@ def image_to_test(dir, src_data):
         print(f'Error as {e}')
     
 def main():
-    try:
-        image_to_test(dir="data/car", src_data="fashxp/cars-manufacturers")
-        image_to_test(dir="data/bike", src_data="Ketansomewhere/bikes")
-    except Exception as e:
-        print(f'Error as {e}')
+    # try:
+    #     image_to_test(dir="data/car", src_data="fashxp/cars-manufacturers")
+    #     image_to_test(dir="data/bike", src_data="Ketansomewhere/bikes")
+    # except Exception as e:
+    #     print(f'Error as {e}')
     
     dls = DataBlock(
     blocks=(ImageBlock, CategoryBlock), 
@@ -53,7 +53,15 @@ def main():
     get_y=parent_label,
     item_tfms=[Resize(192, method='squish')]
     ).dataloaders("data", bs=32)
+    
     dls.show_batch(max_n=6)
+
+    learn = vision_learner(dls, resnet18, metrics=error_rate)
+    learn.fine_tune(3)
+
+    is_car,_,probs = learn.predict(PILImage.create('test_images/Carver-technology-Carver-One-2.jpg'))
+    print(f"This is a: {is_car}.")
+    print(f"Probability it's a car: {probs[0]:.4f}")
 
 
 if __name__ == "__main__":
